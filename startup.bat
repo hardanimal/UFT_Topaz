@@ -1,0 +1,1 @@
+python src\UFT_GUI\main.py
