@@ -245,7 +245,7 @@ class Channel(threading.Thread):
             setattr(dut, attr_name, self.v_cap[i])
         for i in range(len(self.c_cap)):
             attr_name = "capacitance_" + str(i+1)
-            setattr(dut, attr_name, self.c_cap[i])
+            setattr(dut, attr_name, str(self.c_cap[i]) + "%")
 
     def save_db(self):
         # setup database
