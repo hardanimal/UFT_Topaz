@@ -86,9 +86,11 @@ class Channel(threading.Thread):
 
         self.current_case_index = 0
 
-        # 5 time cap measure retry
+        # 5 times cap measure retry
         self.cap_measure_count = 0
+        self.retry_go_back_steps = 5
 
+        # list to store capacitance and individual voltage
         self.c_cap = []
         self.v_cap = []
 
@@ -194,9 +196,9 @@ class Channel(threading.Thread):
                     if case[0] == "PGEM_CAPACITANCE_VOLUME_CHECK":
                         self.c_cap.append(value)
                         if self.cap_measure_count < 4:
-                            self.current_case_index -= 5
+                            self.current_case_index -= self.retry_go_back_steps
                             self.cap_measure_count += 1
-                            self.progressbar -= 5 * (90/step)
+                            self.progressbar -= self.retry_go_back_steps * (90/step)
                             continue
                         else:
                             test_onfail_stop = True
