@@ -311,7 +311,10 @@ class topazfct(object):
             return True, ret
 
     def _setTimeOut_(self, timeout):
-        self.ser.setTimeout(timeout)
+        if serial.VERSION < "3.0":
+            self.ser.setTimeout(timeout)
+        else:
+            self.ser.timeout = timeout
         time.sleep(0.2)
         pass
 
