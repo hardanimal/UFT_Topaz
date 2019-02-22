@@ -15,12 +15,13 @@ __author__ = "@fanmuzhi, @boqiling"
 __all__ = ["dumps", "loads", "Xml2Dict", "Dict2Xml"]
 
 from xml.dom.minidom import Document, parseString, Node
+from collections import OrderedDict
 
 
 def dumps(diction, rootname="entity"):
     '''convert diction to xml
     '''
-    if (type(diction) == dict):
+    if (type(diction) == OrderedDict):
         xml = Dict2Xml(rootname).trans(diction)
         return xml
 
@@ -106,7 +107,7 @@ class Dict2Xml(object):
         self.rootName = rootname
 
     def build(self, father, structure):
-        if type(structure) == dict:
+        if type(structure) == OrderedDict:
             for k in structure:
                 tag = self.doc.createElement(k)
                 father.appendChild(tag)

@@ -11,6 +11,7 @@ __all__ = ["PGEMBase"]
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, DateTime, Float
+from collections import OrderedDict
 
 SQLBase = declarative_base()
 
@@ -50,26 +51,27 @@ class DUT(SQLBase):
     error_code = Column(Integer)
 
     def to_dict(self):
-        return {"barcode": self.barcode,
-                "input_voltage": self.input_voltage,
-                "charge_voltage": self.charge_voltage,
-                "charge_time": self.charge_time,
-                "vpd_program": self.vpd_program,
-                "cap_voltage_1": self.cap_voltage_1,
-                "cap_voltage_2": self.cap_voltage_2,
-                "cap_voltage_3": self.cap_voltage_3,
-                "cap_voltage_4": self.cap_voltage_4,
-                "cap_voltage_5": self.cap_voltage_5,
-                "cap_voltage_6": self.cap_voltage_6,
-                "capacitance_1": self.capacitance_1,
-                "capacitance_2": self.capacitance_2,
-                "capacitance_3": self.capacitance_3,
-                "capacitance_4": self.capacitance_4,
-                "capacitance_5": self.capacitance_5,
-                "switch_voltage": self.switch_voltage,
-                "test_start_time": self.test_start_time,
-                "test_finish_time": self.test_finish_time,
-                "test_result": self.test_result,
-                "error_code": self.error_code
-                }
+        myDict = OrderedDict()
+        myDict["barcode"] = self.barcode
+        myDict["input_voltage"] = self.input_voltage
+        myDict["charge_voltage"] = self.charge_voltage
+        myDict["charge_time"] = self.charge_time
+        myDict["vpd_program"] = self.vpd_program
+        myDict["cap_voltage_1"] = self.cap_voltage_1
+        myDict["cap_voltage_2"] = self.cap_voltage_2
+        myDict["cap_voltage_3"] = self.cap_voltage_3
+        myDict["cap_voltage_4"] = self.cap_voltage_4
+        myDict["cap_voltage_5"] = self.cap_voltage_5
+        myDict["cap_voltage_6"] = self.cap_voltage_6
+        myDict["capacitance_1"] = self.capacitance_1
+        myDict["capacitance_2"] = self.capacitance_2
+        myDict["capacitance_3"] = self.capacitance_3
+        myDict["capacitance_4"] = self.capacitance_4
+        myDict["capacitance_5"] = self.capacitance_5
+        myDict["switch_voltage"] = self.switch_voltage
+        myDict["test_start_time"] = self.test_start_time
+        myDict["test_finish_time"] = self.test_finish_time
+        myDict["test_result"] = self.test_result
+        myDict["error_code"] = self.error_code
+        return myDict
 
