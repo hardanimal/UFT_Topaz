@@ -7,7 +7,7 @@ __version__ = "0.1"
 __author__ = "@dqli"
 
 import os
-import ConfigParser
+import configparser
 import ast
 
 # station settings
