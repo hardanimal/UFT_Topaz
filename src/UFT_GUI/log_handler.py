@@ -8,7 +8,7 @@ __author__ = "@mzfa"
 
 import sys
 import logging
-from PyQt4 import QtCore
+from PyQt5 import QtCore
 
 
 class XStream(QtCore.QObject):
@@ -24,7 +24,7 @@ class XStream(QtCore.QObject):
 
     def write(self, msg):
         if not self.signalsBlocked():
-            self.messageWritten.emit(unicode(msg))
+            self.messageWritten.emit(msg)
 
     @staticmethod
     def stdout():

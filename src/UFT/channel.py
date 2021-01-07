@@ -9,10 +9,12 @@ __author__ = "@dqli"
 __all__ = ["Channel", "ChannelStates"]
 
 import sys
-sys.path.append("./src/")
+sys.path.append("./UFT/backend")
+sys.path.append("./UFT/devices")
+sys.path.append("./UFT/models")
 
 import threading
-from Queue import Queue
+from queue import Queue
 import logging
 import time
 import os
@@ -369,8 +371,8 @@ class Channel(threading.Thread):
             self.queue.get()
 
     def error(self, e):
-        exc = sys.exc_info()
-        logger.error(traceback.format_exc(exc))
+        e_type, e_value, e_traceback = sys.exc_info()
+        logger.error(e_value)
         self.exit = True
         raise e
 

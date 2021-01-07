@@ -15,6 +15,14 @@ logger = logging.getLogger(__name__)
 debugOut = FCT_DEBUG_INFOR
 
 
+class PortDoesNotExist(Exception):
+    pass
+
+
+class PortCanNotOpen(Exception):
+    pass
+
+
 class topazfct(object):
 
     LastSending = ""
@@ -26,18 +34,22 @@ class topazfct(object):
         bytesize = kvargs.get('bytesize', serial.EIGHTBITS)
         stopbits = kvargs.get('stopbits', serial.STOPBITS_ONE)
         try:
+            import os
+            if not os.path.exists(port):
+                raise PortDoesNotExist("Couldn't open serial port {0} - serial port config error!".format(port))
             self.ser = serial.Serial(port=port, baudrate=baudrate,
                                      timeout=timeout, bytesize=bytesize,
                                      parity=parity, stopbits=stopbits)
-        except Exception:
-            raise Exception("Couldn't open serial port {0} - TOPAZ FCT Board does NOT exist or the serial port config error!".format(port))
+        except PortCanNotOpen:
+            raise PortCanNotOpen("Couldn't open serial port {0} - TOPAZ FCT Board does NOT exist!".format(port))
 
         if not self.ser.isOpen():
             self.ser.open()
             self._cleanbuffer_()
 
     def __del__(self):
-        self.ser.close()
+        if 'self.ser' in locals().keys():
+            self.ser.close()
 
 
     def _logging_(self, info):

@@ -15,7 +15,7 @@ STATION_CONFIG = "./xml/station.cfg"
 if not os.path.exists(STATION_CONFIG):
     raise Exception("Station config does not exist!")
 
-config = ConfigParser.RawConfigParser()
+config = configparser.RawConfigParser()
 config.read(STATION_CONFIG)
 
 ALLOWED_PN = ast.literal_eval(config.get('StationConfig', 'ALLOWED_PN'))

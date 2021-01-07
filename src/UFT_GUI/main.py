@@ -3,17 +3,19 @@
 
 __author__ = "dqli"
 __version__ = "1.0"
-__email__ = "dqli@cypress.com"
+
 
 import sys
 sys.path.append("./src/")
+sys.path.append("./src/UFT/")
+sys.path.append("./src/UFT/backend")
+sys.path.append("./src/UFT/devices")
+sys.path.append("./src/UFT/models")
 
 import logging
 import time
-from PyQt4.QtGui import QApplication
-from PyQt4 import QtGui, QtCore
-from UFT_GUI.UFT_UiHandler import UFT_UiHandler
-from UFT_GUI import log_handler
+from PyQt5.QtWidgets import QApplication
+from PyQt5 import QtWidgets, QtGui, QtCore
 
 app = QApplication(sys.argv)
 app.setStyle("Plastique")
@@ -22,13 +24,16 @@ try:
     import UFT
     from UFT.channel import Channel
 except Exception as e:
-    msg = QtGui.QMessageBox()
-    msg.critical(msg, "error", e.message)
+    msg = QtWidgets.QMessageBox()
+    msg.critical(msg, "error", str(e))
+
+from UFT_GUI.UFT_UiHandler import UFT_UiHandler
+from UFT_GUI import log_handler
 
 
-class MainWidget(QtGui.QWidget):
+class MainWidget(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
-        QtGui.QWidget.__init__(self)
+        QtWidgets.QMainWindow.__init__(self)
         self.ui = UFT_UiHandler()
         self.ui.setupUi(self)
         self.ui.setupWidget(self)
@@ -60,21 +65,31 @@ class MainWidget(QtGui.QWidget):
             db_4 = self.ui.barcodes_4()
 
             self.u.loaddata(db_1, db_2, db_3, db_4)
-            self.connect(self.u, QtCore.SIGNAL('progress_bar'), self.ui.progressBar.setValue)
-            self.connect(self.u, QtCore.SIGNAL('is_alive'), self.ui.auto_enable_disable_widgets)
-            self.connect(self.u, QtCore.SIGNAL("dut_status_1"), self.ui.set_dut_status_1)
-            self.connect(self.u, QtCore.SIGNAL("dut_status_2"), self.ui.set_dut_status_2)
-            self.connect(self.u, QtCore.SIGNAL("dut_status_3"), self.ui.set_dut_status_3)
-            self.connect(self.u, QtCore.SIGNAL("dut_status_4"), self.ui.set_dut_status_4)
-            self.connect(self.u, QtCore.SIGNAL('time_used'), self.ui.print_time)
+            
+            self.u.progress_bar.connect(self.ui.progressBar.setValue)
+            self.u.is_alive.connect(self.ui.auto_enable_disable_widgets)
+            self.u.dut_status_1.connect(self.ui.set_dut_status_1)
+            self.u.dut_status_2.connect(self.ui.set_dut_status_2)
+            self.u.dut_status_3.connect(self.ui.set_dut_status_3)
+            self.u.dut_status_4.connect(self.ui.set_dut_status_4)
+            self.u.time_used.connect(self.ui.print_time)
             self.u.start()
 
         except Exception as e:
-            msg = QtGui.QMessageBox()
-            msg.critical(self, "error", e.message)
+            msg = QtWidgets.QMessageBox()
+            msg.critical(self, "error", str(e))
 
 
 class Update(QtCore.QThread):
+    
+    progress_bar = QtCore.pyqtSignal(int)
+    is_alive = QtCore.pyqtSignal(bool)
+    dut_status_1 = QtCore.pyqtSignal(int, int)
+    dut_status_2 = QtCore.pyqtSignal(int, int)
+    dut_status_3 = QtCore.pyqtSignal(int, int)
+    dut_status_4 = QtCore.pyqtSignal(int, int)
+    time_used = QtCore.pyqtSignal(int)
+    
     def __init__(self):
         QtCore.QThread.__init__(self)
 
@@ -127,46 +142,42 @@ class Update(QtCore.QThread):
             ch3.auto_test()
         if not self.erie4_is_empty:
             ch4.auto_test()
-        self.emit(QtCore.SIGNAL("is_alive"), 1)
+        self.is_alive.emit(1)
         while ch1.isAlive() or ch2.isAlive() or ch3.isAlive() or ch4.isAlive():
             sec_count += 1
             c_process = self.getcurrentprocessbar(ch1.isAlive(), ch1.progressbar,
                                                   ch2.isAlive(), ch2.progressbar,
                                                   ch3.isAlive(), ch3.progressbar,
                                                   ch4.isAlive(), ch4.progressbar)
-            self.emit(QtCore.SIGNAL("progress_bar"), c_process)
-            self.emit(QtCore.SIGNAL("time_used"), sec_count)
+            self.progress_bar.emit(c_process)
+            self.time_used.emit(sec_count)
             for dut in ch1.dut_list:
                 if dut is not None:
-                    self.emit(QtCore.SIGNAL("dut_status_1"), dut.slotnum,
-                              dut.status)
+                    self.dut_status_1(int, int).emit(dut.slotnum, dut.status)
             for dut in ch2.dut_list:
                 if dut is not None:
-                    self.emit(QtCore.SIGNAL("dut_status_2"), dut.slotnum,
-                              dut.status)
+                    self.dut_status_2(int, int).emit(dut.slotnum, dut.status)
             for dut in ch3.dut_list:
                 if dut is not None:
-                    self.emit(QtCore.SIGNAL("dut_status_3"), dut.slotnum,
-                              dut.status)
+                    self.dut_status_3(int, int).emit(dut.slotnum, dut.status)
             for dut in ch4.dut_list:
                 if dut is not None:
-                    self.emit(QtCore.SIGNAL("dut_status_4"), dut.slotnum,
-                              dut.status)
+                    self.dut_status_4(int, int).emit(dut.slotnum, dut.status)
             time.sleep(1)
 
-        self.emit(QtCore.SIGNAL("progress_bar"), 100)
+        self.progress_bar.emit(100)
         for dut in ch1.dut_list:
             if dut is not None:
-                self.emit(QtCore.SIGNAL("dut_status_1"), dut.slotnum, dut.status)
+                self.dut_status_1(int, int).emit(dut.slotnum, dut.status)
         for dut in ch2.dut_list:
             if dut is not None:
-                self.emit(QtCore.SIGNAL("dut_status_2"), dut.slotnum, dut.status)
+                self.dut_status_2(int, int).emit(dut.slotnum, dut.status)
         for dut in ch3.dut_list:
             if dut is not None:
-                self.emit(QtCore.SIGNAL("dut_status_3"), dut.slotnum, dut.status)
+                self.dut_status_3(int, int).emit(dut.slotnum, dut.status)
         for dut in ch4.dut_list:
             if dut is not None:
-                self.emit(QtCore.SIGNAL("dut_status_4"), dut.slotnum, dut.status)
+                self.dut_status_4(int, int).emit(dut.slotnum, dut.status)
 
         # clean resource
         if ch1 is not None:
@@ -185,7 +196,7 @@ class Update(QtCore.QThread):
             ch4.save_db()
             time.sleep(0.2)
             del ch4
-        self.emit(QtCore.SIGNAL("is_alive"), 0)
+        self.is_alive.emit(0)
 
     def run(self):
         self.single_run()

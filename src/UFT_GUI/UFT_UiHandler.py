@@ -3,7 +3,7 @@
 
 import sys
 import re
-from PyQt4 import QtGui, QtSql
+from PyQt5 import QtGui, QtSql, QtWidgets
 from UFT_GUI.UFT_Ui import Ui_Form as UFT_UiForm
 from UFT.config import RESULT_DB, RESOURCE
 
@@ -22,7 +22,7 @@ class UFT_UiHandler(UFT_UiForm):
         self.log_db.setDatabaseName(RESULT_DB)
         result = self.log_db.open()
         if (not result):
-            msgbox = QtGui.QMessageBox()
+            msgbox = QtWidgets.QMessageBox()
             msg = self.log_db.lastError().text()
             msgbox.critical(msgbox, "error", msg + " db=" + RESULT_DB)
         # self.log_tableView
@@ -149,10 +149,10 @@ class UFT_UiHandler(UFT_UiForm):
 
 
 if __name__ == "__main__":
-    a = QtGui.QApplication(sys.argv)
-    Form = QtGui.QWidget()
+    app = QtWidgets.QApplication(sys.argv)
+    Form = QtWidgets.QMainWindow()
     w = UFT_UiHandler()
     w.setupUi(Form)
     w.setupWidget(Form)
     Form.show()
-    sys.exit(a.exec_())
+    sys.exit(app.exec_())
