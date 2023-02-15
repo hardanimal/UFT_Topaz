@@ -107,6 +107,6 @@ venv.bak/
 .idea/
 
 # local data
-db/
+#db/
 logs/
 runtime/
