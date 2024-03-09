@@ -7,7 +7,7 @@ __author__ = "@dqli"
 __all__ = ["PGEMBase"]
 
 import logging
-from logger_handler import init_logger
+from .logger_handler import init_logger
 
 formatter = logging.Formatter('[ %(asctime)s ] (%(threadName)s  %(thread)d)'
                               ' %(module)s : %(message)s')

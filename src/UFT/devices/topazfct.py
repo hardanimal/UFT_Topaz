@@ -335,58 +335,74 @@ class topazfct(object):
         self.ser.flushOutput()
 
     def _transfercommand_(self, cmd, datalen=0, data=None):
-        header0 = 0x55
-        header1 = 0x77
-        content = chr(header0) + chr(header1) + chr(cmd)
+        try:
+            header0 = 0x55
+            header1 = 0x77
+            content = chr(header0) + chr(header1) + chr(cmd)
 
-        if (datalen != 0) and (data is not None):
-            sum = 0
-            for d in data:
-                sum = sum + d
-            content += chr(sum & 0xFF)
-        else:
-            content += chr(0x01)
+            if (datalen != 0) and (data is not None):
+                sum = 0
+                for d in data:
+                    sum = sum + d
+                content += chr(sum & 0xFF)
+            else:
+                content += chr(0x01)
 
-        content += chr(datalen & 0xFF)
-        content += chr((datalen >> 8) & 0xFF)
+            content += chr(datalen & 0xFF)
+            content += chr((datalen >> 8) & 0xFF)
 
-        self.LastSending = content
-        self._displaylanguage_(content)
-        self._cleanbuffer_()
-        self.ser.write(content)
-
-        if (datalen != 0) and (data is not None):
-            content=""
-            time.sleep(1)
-            for d in data:
-                content += chr(d)
             self.LastSending = content
             self._displaylanguage_(content)
             self._cleanbuffer_()
-            self.ser.write(content)
+            self.ser.write(content.encode('ascii'))
+
+            if (datalen != 0) and (data is not None):
+                content=""
+                time.sleep(1)
+                for d in data:
+                    content += chr(d)
+                self.LastSending = content
+                self._displaylanguage_(content)
+                self._cleanbuffer_()
+                self.ser.write(content.encode('ascii'))
+
+        except Exception as e:
+            logger.error(e)
+            raise e
 
     def _receiveresult_(self):
-        buff = []
-        content = ""
-        idx = 0
-        datalen = 22
+        try:
+            buff = []
+            content = ""
+            idx = 0
+            datalen = 22
 
-        while(datalen > 0):
-            tmp = self.ser.read(1)
-            if tmp == "":
-                break
-            idx += 1
-            datalen -= 1
-            content += tmp
-            buff.append(ord(tmp))
+            while(datalen > 0):
+                tmp = self.ser.read(1)
+                print(tmp)
+                if tmp == b'':
+                    break
+                idx += 1
+                datalen -= 1
+                content += str(tmp)
+                buff.append(ord(tmp))
 
-        self.LastReceiving = content
-        self._displaylanguage_(content)
-        if len(buff) < 7:
-            self._erroroutinfor_()
-            raise Exception("Hardware is NOT ready")
-        if False:
-            if buff[0] != 0x55 or buff[1] != 0x77:
+            self.LastReceiving = content
+            self._displaylanguage_(content)
+            if len(buff) < 7:
                 self._erroroutinfor_()
-                raise Exception("UART communication failure")
-        return buff
+                raise Exception("Hardware is NOT ready")
+            if False:
+                if buff[0] != 0x55 or buff[1] != 0x77:
+                    self._erroroutinfor_()
+                    raise Exception("UART communication failure")
+            return buff
+        except Exception as e:
+            logger.error(e)
+            raise e
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+
+    tpz = topazfct(port="/dev/ttyS0", boardid=1)
+    tpz.ConnectBoard()

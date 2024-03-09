@@ -143,41 +143,41 @@ class Update(QtCore.QThread):
         if not self.erie4_is_empty:
             ch4.auto_test()
         self.is_alive.emit(1)
-        while ch1.isAlive() or ch2.isAlive() or ch3.isAlive() or ch4.isAlive():
+        while ch1.is_alive() or ch2.is_alive() or ch3.is_alive() or ch4.is_alive():
             sec_count += 1
-            c_process = self.getcurrentprocessbar(ch1.isAlive(), ch1.progressbar,
-                                                  ch2.isAlive(), ch2.progressbar,
-                                                  ch3.isAlive(), ch3.progressbar,
-                                                  ch4.isAlive(), ch4.progressbar)
+            c_process = self.getcurrentprocessbar(ch1.is_alive(), ch1.progressbar,
+                                                  ch2.is_alive(), ch2.progressbar,
+                                                  ch3.is_alive(), ch3.progressbar,
+                                                  ch4.is_alive(), ch4.progressbar)
             self.progress_bar.emit(c_process)
             self.time_used.emit(sec_count)
             for dut in ch1.dut_list:
                 if dut is not None:
-                    self.dut_status_1(int, int).emit(dut.slotnum, dut.status)
+                    self.dut_status_1.emit(dut.slotnum, dut.status)
             for dut in ch2.dut_list:
                 if dut is not None:
-                    self.dut_status_2(int, int).emit(dut.slotnum, dut.status)
+                    self.dut_status_2.emit(dut.slotnum, dut.status)
             for dut in ch3.dut_list:
                 if dut is not None:
-                    self.dut_status_3(int, int).emit(dut.slotnum, dut.status)
+                    self.dut_status_3.emit(dut.slotnum, dut.status)
             for dut in ch4.dut_list:
                 if dut is not None:
-                    self.dut_status_4(int, int).emit(dut.slotnum, dut.status)
+                    self.dut_status_4.emit(dut.slotnum, dut.status)
             time.sleep(1)
 
         self.progress_bar.emit(100)
         for dut in ch1.dut_list:
             if dut is not None:
-                self.dut_status_1(int, int).emit(dut.slotnum, dut.status)
+                self.dut_status_1.emit(dut.slotnum, dut.status)
         for dut in ch2.dut_list:
             if dut is not None:
-                self.dut_status_2(int, int).emit(dut.slotnum, dut.status)
+                self.dut_status_2.emit(dut.slotnum, dut.status)
         for dut in ch3.dut_list:
             if dut is not None:
-                self.dut_status_3(int, int).emit(dut.slotnum, dut.status)
+                self.dut_status_3.emit(dut.slotnum, dut.status)
         for dut in ch4.dut_list:
             if dut is not None:
-                self.dut_status_4(int, int).emit(dut.slotnum, dut.status)
+                self.dut_status_4.emit(dut.slotnum, dut.status)
 
         # clean resource
         if ch1 is not None:
